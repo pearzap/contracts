@@ -361,20 +361,16 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
         // pending reward for user
         uint256 pending = user.amount.mul(pool.accPearPerShare).div(1e12).sub(user.rewardDebt);
-        
-        if (_isWithdrawal) {
-            if (noWithdrawFee(_pid, msg.sender)) {
-                // if user withdrawal after the interval, user get 100% of pending reward
-                // nothing to do here
-            }     
-            else {
+
+        if (_isWithdrawal && noWithdrawFee(_pid, msg.sender)==false) {
+                // reset timer
+                user.noWithdrawalFeeAfter = block.timestamp.add(pool.withdrawalFeeInterval);
                 // if user withdrawal before the interval, user get X% less of pending reward
                 uint256 withdrawalfeeamount = pending.mul(pool.withdrawalFeeBP).div(10000);
                 pending = pending.sub(withdrawalfeeamount);
                 // tax on withdrawal is send to the burn address
                 safePearTransfer(BURN_ADDRESS, withdrawalfeeamount);                
-            }
-        }
+        }        
         
         if (canHarvest(_pid, msg.sender)) {
             if (pending > 0 || user.rewardLockedUp > 0) {
