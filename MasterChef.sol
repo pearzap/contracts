@@ -274,7 +274,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         pear.mint(BURN_ADDRESS, pearReward.mul(20).div(1000));
         // Automatically mint some PEAR for the lottery pot
         if (address(lotteryAddress) != address(0) && lotteryMintRate > 0) {
-            pear.mint(BURN_ADDRESS, pearReward.mul(lotteryMintRate).div(10000));
+            pear.mint(lotteryAddress, pearReward.mul(lotteryMintRate).div(10000));
         }        
         pear.mint(address(this), pearReward);
         pool.accPearPerShare = pool.accPearPerShare.add(pearReward.mul(1e12).div(lpSupply));
@@ -472,7 +472,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
 
     // Update lottery mint rate by the owner
     function setLotteryMintRate(uint16 _lotteryMintRate) public onlyOwner {
-        // Max lottery mint rate: 4%.
+        // Max lottery mint rate: 5%.
         require(_lotteryMintRate <= 500, "setLotteryMintRate: invalid lottery mint rate basis points");
         emit LotteryMintRateUpdated(msg.sender, lotteryMintRate, _lotteryMintRate);
         lotteryMintRate = _lotteryMintRate;
