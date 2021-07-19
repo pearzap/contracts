@@ -88,20 +88,22 @@ contract PearToken is BEP20 {
         
         if (recipient == BURN_ADDRESS || _excludedFromTrsfTax[sender] == true || _excludedFromTrsfTax[recipient] == true) {            
             super._transfer(sender, recipient, amount);
+            _moveDelegates(_delegates[sender], _delegates[recipient], amount);
         } else {
             
-            // default burn tax is 1% of every transfer
+            // default burn tax is 2% by default of every transfer
             uint256 burnAmount = amount.mul(burnRateTax).div(10000);
 
-            // default 99% of transfer sent to recipient
+            // default 98% of transfer sent to recipient
             uint256 sendAmount = amount.sub(burnAmount);
             
             require(amount == sendAmount + burnAmount, "PEAR::transfer: Burn value invalid");
 
             super._transfer(sender, BURN_ADDRESS, burnAmount);
+            _moveDelegates(_delegates[sender], _delegates[BURN_ADDRESS], burnAmount);
             super._transfer(sender, recipient, sendAmount);
-            amount = sendAmount;            
-
+            _moveDelegates(_delegates[sender], _delegates[recipient], sendAmount);
+            amount = sendAmount;   
         }
     }
     
