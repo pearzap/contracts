@@ -40,6 +40,7 @@ contract Timelock {
     constructor(address admin_, uint delay_) public {
         require(delay_ >= MINIMUM_DELAY, "Timelock::constructor: Delay must exceed minimum delay.");
         require(delay_ <= MAXIMUM_DELAY, "Timelock::constructor: Delay must not exceed maximum delay.");
+        require(admin_ !=  address(0), "Timelock::constructor: admin_ is zero address");
 
         admin = admin_;
         delay = delay_;
@@ -67,6 +68,7 @@ contract Timelock {
     }
 
     function setPendingAdmin(address pendingAdmin_) public {
+        require(pendingAdmin_ !=  address(0), "Timelock::setPendingAdmin: pendingAdmin_ is zero address");
         // allows one time setting of admin for deployment purposes
         if (admin_initialized) {
             require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
@@ -82,6 +84,7 @@ contract Timelock {
     function queueTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) public returns (bytes32) {
         require(msg.sender == admin, "Timelock::queueTransaction: Call must come from admin.");
         require(eta >= getBlockTimestamp().add(delay), "Timelock::queueTransaction: Estimated execution block must satisfy delay.");
+        require(target !=  address(0), "Timelock::queueTransaction: target is zero address");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = true;
@@ -106,6 +109,7 @@ contract Timelock {
         require(queuedTransactions[txHash], "Timelock::executeTransaction: Transaction hasn't been queued.");
         require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
         require(getBlockTimestamp() <= eta.add(GRACE_PERIOD), "Timelock::executeTransaction: Transaction is stale.");
+        require(target !=  address(0), "Timelock::executeTransaction: target is zero address");
 
         queuedTransactions[txHash] = false;
 
