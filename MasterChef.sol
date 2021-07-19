@@ -180,6 +180,7 @@ contract MasterChef is Ownable, ReentrancyGuard {
         // withdrawal fee can't excess more than 10%
         require(_withdrawalFeeBP <= MAXIMUM_WITHDRAWAL_FEE, "add: invalid deposit fee basis points");      
         require(_harvestInterval <= MAXIMUM_HARVEST_INTERVAL, "add: invalid harvest interval");
+        require(_withdrawalFeeInterval <= MAXIMUM_WITHDRAWFEE_INTERVAL, "add: invalid withdrawal fee interval");
         if (_withUpdate) {
             massUpdatePools();
         }
